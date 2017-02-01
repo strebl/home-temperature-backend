@@ -60,6 +60,6 @@ class TemperatureController extends Controller
 
         $database->writePoints($points);
 
-        return response('Measurement Created', 201);
+        return response('', 201);
     }
 }
