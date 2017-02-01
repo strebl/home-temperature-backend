@@ -15,23 +15,30 @@ class TemperatureController extends Controller
      *
      * @param Database $database
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Support\Collection
      */
     public function index(Database $database)
     {
         $fromTime = Carbon::now()->subHours(3)->timestamp * 1000000000;
 
-        $points = $database->getQueryBuilder()
+        $query = $database->getQueryBuilder()
             ->select('*')
             ->from('temperature')
             ->groupBy('sensor')
             ->groupBy('time(5m)')
             ->mean('temperature')
             ->where(["time > $fromTime"])
-            ->getResultSet()
+            ->getQuery();
+
+        $sensors = $database->query("$query fill(none)")
             ->getSeries();
 
-        dd($points);
+        return collect($sensors)->map(function ($sensor) {
+            return [
+                'sensor' => $sensor['tags']['sensor'],
+                'data' => $sensor['values'],
+            ];
+        });
     }
 
     /**
