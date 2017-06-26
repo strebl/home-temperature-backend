@@ -19,13 +19,13 @@ class TemperatureController extends Controller
      */
     public function index(Database $database)
     {
-        $fromTime = Carbon::now()->subHours(3)->timestamp * 1000000000;
+        $fromTime = Carbon::now()->subHours(25)->timestamp * 1000000000;
 
         $query = $database->getQueryBuilder()
             ->select('*')
             ->from('temperature')
             ->groupBy('sensor')
-            ->groupBy('time(5m)')
+            ->groupBy('time(40m)')
             ->mean('temperature')
             ->where(["time > $fromTime"])
             ->getQuery();
