@@ -36,7 +36,11 @@ class TemperatureController extends Controller
         return collect($sensors)->map(function ($sensor) {
             return [
                 'sensor' => $sensor['tags']['sensor'],
-                'data' => $sensor['values'],
+                'data' => collect($sensor['values'])->map(function ($value) {
+                    $value[1] = round($value[1], 1);
+
+                    return $value;
+                }),
             ];
         });
     }
