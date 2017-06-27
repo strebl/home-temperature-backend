@@ -10,6 +10,13 @@ use InfluxDB\Point;
 
 class TemperatureController extends Controller
 {
+    protected $database;
+
+    public function __construct(Database $database)
+    {
+        $this->database = $database;
+    }
+
     /**
      * Get all sensors.
      *
@@ -17,21 +24,9 @@ class TemperatureController extends Controller
      *
      * @return \Illuminate\Support\Collection
      */
-    public function index(Database $database)
+    public function index($range)
     {
-        $fromTime = Carbon::now()->subHours(25)->timestamp * 1000000000;
-
-        $query = $database->getQueryBuilder()
-            ->select('*')
-            ->from('temperature')
-            ->groupBy('sensor')
-            ->groupBy('time(40m)')
-            ->mean('temperature')
-            ->where(["time > $fromTime"])
-            ->getQuery();
-
-        $sensors = $database->query("$query fill(none)")
-            ->getSeries();
+        $sensors = $this->{"temperaturesForA".ucfirst($range)}();
 
         return collect($sensors)->map(function ($sensor) {
             return [
@@ -45,6 +40,47 @@ class TemperatureController extends Controller
         });
     }
 
+    protected function temperaturesForADay()
+    {
+        $fromTime = Carbon::now()->subHours(25);
+        $resolution = '40m';
+        
+        return $this->temperatures($fromTime, $resolution);
+    }
+
+    protected function temperaturesForAWeek()
+    {
+        $fromTime = Carbon::now()->subDays(8);
+        $resolution = '5h';
+        
+        return $this->temperatures($fromTime, $resolution);
+    }
+
+    protected function temperaturesForAMonth()
+    {
+        $fromTime = Carbon::now()->subDays(31);
+        $resolution = '31d';
+        
+        return $this->temperatures($fromTime, $resolution);
+    }
+
+    protected function temperatures($fromTime, $resolution)
+    {
+        $fromTime = $fromTime->timestamp * 1000000000;
+
+        $query = $this->database->getQueryBuilder()
+            ->select('*')
+            ->from('temperature')
+            ->groupBy('sensor')
+            ->groupBy("time($resolution)")
+            ->mean('temperature')
+            ->where(["time > $fromTime"])
+            ->getQuery();
+
+        return $this->database->query("$query fill(none)")
+            ->getSeries();
+    }
+
     /**
      * Add a new Temperature Measurement.
      *
@@ -53,7 +89,7 @@ class TemperatureController extends Controller
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function store(Request $request, Database $database)
+    public function store(Request $request)
     {
         $this->validate($request, [
             'value' => 'required',
@@ -69,7 +105,7 @@ class TemperatureController extends Controller
             )
         ];
 
-        $database->writePoints($points);
+        $this->database->writePoints($points);
 
         return response('', 201);
     }
