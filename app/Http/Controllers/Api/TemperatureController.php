@@ -83,6 +83,7 @@ class TemperatureController extends Controller
             ->groupBy("time($resolution)")
             ->mean('temperature')
             ->where(["time > $fromTime"])
+            ->where('temperature > 0')
             ->getQuery();
 
         return $this->database->query("$query fill(none)")
@@ -103,6 +104,10 @@ class TemperatureController extends Controller
             'value' => 'required',
             'device' => 'required',
         ]);
+
+        if ($request->value === 0) {
+            return response('', 201);
+        }
 
         $points = [
             new Point(
