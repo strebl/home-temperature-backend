@@ -59,7 +59,7 @@ class TemperatureController extends Controller
     protected function temperaturesForAMonth()
     {
         $fromTime = Carbon::now()->subDays(31);
-        $resolution = '31d';
+        $resolution = '1d';
         
         return $this->temperatures($fromTime, $resolution);
     }
