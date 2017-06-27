@@ -84,7 +84,8 @@ class TemperatureController extends Controller
             ->mean('temperature')
             ->where([
                 "time > $fromTime",
-                'temperature > 0'
+                'temperature > 1',
+                'temperature < 100'
             ])
             ->getQuery();
 
