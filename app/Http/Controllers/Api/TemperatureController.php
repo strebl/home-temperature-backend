@@ -82,8 +82,10 @@ class TemperatureController extends Controller
             ->groupBy('sensor')
             ->groupBy("time($resolution)")
             ->mean('temperature')
-            ->where(["time > $fromTime"])
-            ->where('temperature > 0')
+            ->where([
+                "time > $fromTime",
+                'temperature > 0'
+            ])
             ->getQuery();
 
         return $this->database->query("$query fill(none)")
