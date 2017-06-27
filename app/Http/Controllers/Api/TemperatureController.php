@@ -64,6 +64,14 @@ class TemperatureController extends Controller
         return $this->temperatures($fromTime, $resolution);
     }
 
+    protected function temperaturesForAYear()
+    {
+        $fromTime = Carbon::now()->subDays(365);
+        $resolution = '1w';
+        
+        return $this->temperatures($fromTime, $resolution);
+    }
+
     protected function temperatures($fromTime, $resolution)
     {
         $fromTime = $fromTime->timestamp * 1000000000;
