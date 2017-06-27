@@ -117,7 +117,7 @@ class TemperatureController extends Controller
                 'temperature',
                 null,
                 ['sensor' => $request->device],
-                ['temperature' => (float) $request->value]
+                ['temperature' => round((float) $request->value, 1)]
             )
         ];
 
