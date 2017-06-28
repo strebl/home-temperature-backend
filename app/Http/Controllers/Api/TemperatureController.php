@@ -40,6 +40,14 @@ class TemperatureController extends Controller
         });
     }
 
+    protected function temperaturesForAHour()
+    {
+        $fromTime = Carbon::now()->subHour();
+        $resolution = '2m';
+        
+        return $this->temperatures($fromTime, $resolution);
+    }
+
     protected function temperaturesForADay()
     {
         $fromTime = Carbon::now()->subHours(25);
