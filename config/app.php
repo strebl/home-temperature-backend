@@ -166,8 +166,6 @@ return [
         /*
          * Package Service Providers...
          */
-        Laravel\Tinker\TinkerServiceProvider::class,
-        Barryvdh\Cors\ServiceProvider::class,
 
         /*
          * Application Service Providers...
