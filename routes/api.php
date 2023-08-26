@@ -13,3 +13,5 @@
 
 Route::middleware('auth:api')->get('/temperature/{range}', 'Api\TemperatureController@index');
 Route::middleware('auth:api')->post('/temperature', 'Api\TemperatureController@store');
+Route::middleware('auth:api')->get('/humidity/{range}', 'Api\HumidityController@index');
+Route::middleware('auth:api')->post('/humidity', 'Api\HumidityController@store');
